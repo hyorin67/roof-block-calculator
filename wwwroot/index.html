@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Triangular Roof Block Solid — Volume Calculator</title>
+<style>
+  :root{
+    --navy-900:#050d1f;
+    --navy-800:#0a1733;
+    --navy-700:#0f2147;
+    --navy-600:#152d63;
+    --navy-500:#1c3a82;
+    --accent:#4f8cff;
+    --accent-glow:rgba(79,140,255,0.45);
+    --text:#e6ecff;
+    --muted:#8aa0c9;
+    --border:rgba(120,160,255,0.18);
+    --success:#5ce1c2;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html,body{height:100%;}
+  body{
+    font-family:'Segoe UI', system-ui, -apple-system, sans-serif;
+    background:
+      radial-gradient(1200px 600px at 80% -10%, rgba(79,140,255,0.18), transparent 60%),
+      radial-gradient(900px 500px at -10% 110%, rgba(92,225,194,0.12), transparent 60%),
+      linear-gradient(160deg, var(--navy-900) 0%, var(--navy-800) 60%, var(--navy-700) 100%);
+    color:var(--text);
+    min-height:100vh;
+    padding:40px 20px;
+    line-height:1.5;
+  }
+  .container{max-width:1100px;margin:0 auto;}
+  header{
+    text-align:center;
+    margin-bottom:40px;
+  }
+  header h1{
+    font-size:clamp(28px, 4vw, 44px);
+    font-weight:700;
+    letter-spacing:-0.5px;
+    background:linear-gradient(90deg, #ffffff 0%, var(--accent) 100%);
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+  }
+  header p{
+    color:var(--muted);
+    margin-top:10px;
+    font-size:16px;
+  }
+  .grid{
+    display:grid;
+    grid-template-columns:1.1fr 0.9fr;
+    gap:28px;
+  }
+  @media (max-width: 900px){
+    .grid{grid-template-columns:1fr;}
+  }
+  .card{
+    background:linear-gradient(180deg, rgba(21,45,99,0.55), rgba(10,23,51,0.7));
+    border:1px solid var(--border);
+    border-radius:18px;
+    padding:28px;
+    backdrop-filter:blur(8px);
+    box-shadow:0 18px 60px rgba(0,0,0,0.45);
+  }
+  .card h2{
+    font-size:20px;
+    margin-bottom:18px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .card h2::before{
+    content:"";
+    width:8px;height:8px;border-radius:50%;
+    background:var(--accent);
+    box-shadow:0 0 12px var(--accent-glow);
+  }
+  .section{margin-bottom:22px;}
+  .section-title{
+    font-size:13px;
+    text-transform:uppercase;
+    letter-spacing:1.5px;
+    color:var(--accent);
+    margin-bottom:12px;
+    font-weight:600;
+  }
+  .field-row{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+    margin-bottom:10px;
+  }
+  .field{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+  }
+  .field label{
+    font-size:12px;
+    color:var(--muted);
+    font-weight:500;
+  }
+  .field input{
+    background:rgba(5,13,31,0.7);
+    border:1px solid var(--border);
+    color:var(--text);
+    padding:11px 13px;
+    border-radius:10px;
+    font-size:15px;
+    font-family:inherit;
+    outline:none;
+    transition:border-color .15s, box-shadow .15s;
+  }
+  .field input:focus{
+    border-color:var(--accent);
+    box-shadow:0 0 0 3px rgba(79,140,255,0.18);
+  }
+  .actions{
+    display:flex;
+    gap:12px;
+    margin-top:24px;
+  }
+  button{
+    flex:1;
+    padding:13px 18px;
+    border-radius:10px;
+    border:none;
+    cursor:pointer;
+    font-size:15px;
+    font-weight:600;
+    font-family:inherit;
+    transition:transform .1s, box-shadow .15s, background .15s;
+  }
+  .btn-primary{
+    background:linear-gradient(135deg, var(--accent) 0%, #2c6cff 100%);
+    color:#fff;
+    box-shadow:0 8px 22px rgba(79,140,255,0.35);
+  }
+  .btn-primary:hover{transform:translateY(-1px);box-shadow:0 12px 28px rgba(79,140,255,0.5);}
+  .btn-secondary{
+    background:transparent;
+    color:var(--muted);
+    border:1px solid var(--border);
+  }
+  .btn-secondary:hover{color:var(--text);border-color:var(--accent);}
+
+  .result-card{
+    background:linear-gradient(180deg, rgba(28,58,130,0.55), rgba(15,33,71,0.8));
+    border:1px solid rgba(92,225,194,0.25);
+  }
+  .total-box{
+    background:rgba(5,13,31,0.65);
+    border:1px solid rgba(92,225,194,0.35);
+    border-radius:14px;
+    padding:22px;
+    text-align:center;
+    margin-bottom:18px;
+  }
+  .total-label{
+    font-size:12px;
+    text-transform:uppercase;
+    letter-spacing:1.5px;
+    color:var(--muted);
+  }
+  .total-value{
+    font-size:38px;
+    font-weight:700;
+    color:var(--success);
+    margin-top:6px;
+    text-shadow:0 0 24px rgba(92,225,194,0.35);
+  }
+  .total-unit{font-size:16px;color:var(--muted);margin-left:6px;font-weight:500;}
+  .breakdown{display:flex;flex-direction:column;gap:10px;}
+  .breakdown-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:12px 14px;
+    background:rgba(5,13,31,0.45);
+    border:1px solid var(--border);
+    border-radius:10px;
+    font-size:14px;
+  }
+  .breakdown-row .name{color:var(--muted);}
+  .breakdown-row .val{color:var(--text);font-weight:600;}
+  .formula{
+    font-family:'Consolas','Monaco',monospace;
+    background:rgba(5,13,31,0.6);
+    border:1px dashed var(--border);
+    padding:12px 14px;
+    border-radius:10px;
+    color:var(--muted);
+    font-size:13px;
+    margin-top:6px;
+  }
+  .diagram{
+    text-align:center;
+    margin-bottom:14px;
+  }
+  .diagram svg{max-width:100%;height:auto;}
+  footer{
+    text-align:center;
+    color:var(--muted);
+    font-size:12px;
+    margin-top:36px;
+  }
+  .error{
+    color:#ff8a8a;
+    background:rgba(255,80,80,0.1);
+    border:1px solid rgba(255,80,80,0.3);
+    padding:10px 14px;
+    border-radius:10px;
+    font-size:13px;
+    margin-top:14px;
+    display:none;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>Triangular Roof Block Solid</h1>
+    <p>A web-based volume calculator for an irregular composite solid — built with HTML &amp; C#</p>
+  </header>
+
+  <div class="grid">
+    <!-- INPUT CARD -->
+    <div class="card">
+      <h2>Input Dimensions</h2>
+
+      <div class="diagram">
+        <svg viewBox="0 0 320 180" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="g1" x1="0" x2="1" y1="0" y2="1">
+              <stop offset="0%" stop-color="#4f8cff" stop-opacity="0.85"/>
+              <stop offset="100%" stop-color="#1c3a82" stop-opacity="0.85"/>
+            </linearGradient>
+            <linearGradient id="g2" x1="0" x2="0" y1="0" y2="1">
+              <stop offset="0%" stop-color="#5ce1c2" stop-opacity="0.85"/>
+              <stop offset="100%" stop-color="#1c3a82" stop-opacity="0.85"/>
+            </linearGradient>
+          </defs>
+          <!-- Main rectangular prism -->
+          <polygon points="40,140 200,140 240,120 80,120" fill="url(#g1)" stroke="#4f8cff" stroke-width="1"/>
+          <polygon points="40,140 200,140 200,90 40,90" fill="url(#g1)" stroke="#4f8cff" stroke-width="1" opacity="0.85"/>
+          <polygon points="200,90 240,70 240,120 200,140" fill="#0f2147" stroke="#4f8cff" stroke-width="1"/>
+          <!-- Triangular prism roof -->
+          <polygon points="40,90 120,55 200,90" fill="url(#g2)" stroke="#5ce1c2" stroke-width="1"/>
+          <polygon points="200,90 240,70 160,35 120,55" fill="#0f2147" stroke="#5ce1c2" stroke-width="1"/>
+          <polygon points="120,55 160,35 240,70 200,90" fill="url(#g2)" opacity="0.85" stroke="#5ce1c2" stroke-width="1"/>
+        </svg>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Rectangular Block (Base)</div>
+        <div class="field-row">
+          <div class="field"><label for="l1">Length (m)</label><input type="number" id="l1" step="0.01" value="6" /></div>
+          <div class="field"><label for="w1">Width (m)</label><input type="number" id="w1" step="0.01" value="4" /></div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label for="h1">Height (m)</label><input type="number" id="h1" step="0.01" value="3" /></div>
+          <div class="field"></div>
+        </div>
+        <div class="formula">V₁ = l × w × h</div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Triangular Prism (Roof)</div>
+        <div class="field-row">
+          <div class="field"><label for="b2">Base of triangle (m)</label><input type="number" id="b2" step="0.01" value="4" /></div>
+          <div class="field"><label for="h2">Height of triangle (m)</label><input type="number" id="h2" step="0.01" value="2" /></div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label for="L2">Length of prism (m)</label><input type="number" id="L2" step="0.01" value="6" /></div>
+          <div class="field"></div>
+        </div>
+        <div class="formula">V₂ = ½ × b × h × L</div>
+      </div>
+
+      <div class="actions">
+        <button class="btn-primary" id="calcBtn">Calculate Volume</button>
+        <button class="btn-secondary" id="resetBtn">Reset</button>
+      </div>
+      <div class="error" id="errorBox"></div>
+    </div>
+
+    <!-- RESULT CARD -->
+    <div class="card result-card">
+      <h2>Computed Volume</h2>
+      <div class="total-box">
+        <div class="total-label">Total Volume</div>
+        <div><span class="total-value" id="totalVal">0.00</span><span class="total-unit">m³</span></div>
+      </div>
+      <div class="breakdown">
+        <div class="breakdown-row">
+          <span class="name">V₁ — Rectangular Block</span>
+          <span class="val"><span id="v1">0.00</span> m³</span>
+        </div>
+        <div class="breakdown-row">
+          <span class="name">V₂ — Triangular Roof</span>
+          <span class="val"><span id="v2">0.00</span> m³</span>
+        </div>
+      </div>
+
+      <div style="margin-top:22px;">
+        <div class="section-title">Combined Formula</div>
+        <div class="formula">V<sub>total</sub> = (l · w · h) + (½ · b · h · L)</div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    All calculations are performed by C# on the server (see <code>VolumeCalculator.cs</code>).
+  </footer>
+</div>
+
+<script>
+  function getVal(id){ return parseFloat(document.getElementById(id).value); }
+
+  document.getElementById('calcBtn').addEventListener('click', async () => {
+    const ids = ['l1','w1','h1','b2','h2','L2'];
+    const errBox = document.getElementById('errorBox');
+    errBox.style.display = 'none';
+
+    const vals = ids.map(getVal);
+    if (vals.some(v => isNaN(v) || v < 0)){
+      errBox.textContent = 'Please enter valid non-negative numbers for every field.';
+      errBox.style.display = 'block';
+      return;
+    }
+
+    const payload = {
+      L1: vals[0], W1: vals[1], H1: vals[2],
+      B2: vals[3], H2: vals[4], LL2: vals[5]
+    };
+
+    try {
+      const resp = await fetch('/api/calculate', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(payload)
+      });
+      if (!resp.ok) throw new Error('Server returned ' + resp.status);
+      const data = await resp.json();
+
+      document.getElementById('v1').textContent = data.v1.toFixed(2);
+      document.getElementById('v2').textContent = data.v2.toFixed(2);
+      document.getElementById('totalVal').textContent = data.total.toFixed(2);
+    } catch (err) {
+      errBox.textContent = 'Could not reach the C# server: ' + err.message;
+      errBox.style.display = 'block';
+    }
+  });
+
+  document.getElementById('resetBtn').addEventListener('click', () => {
+    const defaults = {l1:6,w1:4,h1:3,b2:4,h2:2,L2:6};
+    for (const k in defaults) document.getElementById(k).value = defaults[k];
+    document.getElementById('v1').textContent = '0.00';
+    document.getElementById('v2').textContent = '0.00';
+    document.getElementById('totalVal').textContent = '0.00';
+    document.getElementById('errorBox').style.display = 'none';
+  });
+
+  // Auto-calc on load
+  document.getElementById('calcBtn').click();
+</script>
+</body>
+</html>
